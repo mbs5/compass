@@ -1,3 +1,5 @@
+"use client";
+
 import {
   LineChart,
   Line,
@@ -49,6 +51,10 @@ const data = [
 ];
 
 export function HealthTrendsChart() {
+  if (typeof window === "undefined") {
+    return null; // Return null on server-side
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart

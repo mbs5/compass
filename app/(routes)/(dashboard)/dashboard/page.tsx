@@ -1,6 +1,8 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { HealthTrendsChart } from "@/components/charts/health-trends-chart";
+import { HealthTrendsChart } from "@/app/components/charts/health-trends-chart";
 
 export default function DashboardPage() {
   return (
