@@ -1,117 +1,140 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { HealthTrendsChart } from "@/app/components/charts/health-trends-chart";
-import { InterventionCard } from "@/app/components/recommendations/intervention-card";
+import { useEffect, useState } from "react";
 import { EquityFilters } from "@/app/components/filters/equity-filters";
-import { ChatInterface } from "@/app/components/ai/chat-interface";
+import { StatsCard } from "@/app/components/dashboard/stats-card";
+import { HealthTrendsChart } from "@/app/components/charts/health-trends-chart";
+import { DemographicDistribution } from "@/app/components/charts/demographic-distribution";
+import { ConditionDistribution } from "@/app/components/charts/condition-distribution";
 
-const recommendations = [
-  {
-    title: "Telehealth Diabetes Management Program",
-    description: "Implement remote monitoring and virtual consultations for high-risk diabetes patients to reduce complications and ED visits.",
-    roi: "3.2x",
-    impact: "High",
-    timeframe: "6mo",
-  },
-  {
-    title: "Community Health Worker Program",
-    description: "Deploy trained community health workers in underserved areas to improve preventive care and cultural competency.",
-    roi: "2.5x",
-    impact: "High",
-    timeframe: "12mo",
-  },
-];
+interface DashboardStats {
+  totalPatients: {
+    current: number;
+    change: { value: number; period: string; trend: 'up' | 'down' };
+    rawData?: any[];
+  };
+  activeCases: {
+    current: number;
+    change: { value: number; period: string; trend: 'up' | 'down' };
+    rawData?: any[];
+  };
+  readmissionRate: {
+    current: number;
+    change: { value: number; period: string; trend: 'up' | 'down' };
+    rawData?: any[];
+  };
+  patientSatisfaction: {
+    current: number;
+    change: { value: number; period: string; trend: 'up' | 'down' };
+    rawData?: any[];
+  };
+}
+
+interface Filters {
+  gender?: string;
+  race?: string;
+  ethnicity?: string;
+  state?: string;
+  condition?: string;
+}
 
 export default function DashboardPage() {
-  return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [filters, setFilters] = useState<Filters>({});
+
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+    // Refetch stats with new filters
+    fetchStats(newFilters);
+  };
+
+  const fetchStats = async (currentFilters: Filters = {}) => {
+    try {
+      const params = new URLSearchParams();
+      Object.entries(currentFilters).forEach(([key, value]) => {
+        if (value) params.append(key, value);
+      });
+
+      const response = await fetch(`/api/dashboard-stats?${params}`);
+      if (!response.ok) throw new Error("Failed to fetch dashboard stats");
+      const data = await response.json();
+      setStats(data);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  if (!stats) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading dashboard data...</div>
       </div>
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview" className="space-y-4">
-          <EquityFilters />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="p-6">
-              <h3 className="text-sm font-medium">Total Patients</h3>
-              <div className="mt-2 text-2xl font-bold">2,350</div>
-              <p className="text-xs text-muted-foreground">+180 from last month</p>
-            </Card>
-            <Card className="p-6">
-              <h3 className="text-sm font-medium">Active Cases</h3>
-              <div className="mt-2 text-2xl font-bold">1,203</div>
-              <p className="text-xs text-muted-foreground">+20 from last week</p>
-            </Card>
-            <Card className="p-6">
-              <h3 className="text-sm font-medium">Readmission Rate</h3>
-              <div className="mt-2 text-2xl font-bold">12.3%</div>
-              <p className="text-xs text-muted-foreground">-2.1% from last month</p>
-            </Card>
-            <Card className="p-6">
-              <h3 className="text-sm font-medium">Patient Satisfaction</h3>
-              <div className="mt-2 text-2xl font-bold">94.2%</div>
-              <p className="text-xs text-muted-foreground">+1.2% from last month</p>
-            </Card>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4 p-6">
-              <h3 className="text-lg font-medium mb-4">Population Health Trends</h3>
-              <div className="h-[300px]">
-                <HealthTrendsChart />
-              </div>
-            </Card>
-            <Card className="col-span-3 p-6">
-              <h3 className="text-lg font-medium">Health Disparities Map</h3>
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                Map Component Coming Soon
-              </div>
-            </Card>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Recommended Interventions</h3>
-              <div className="space-y-4">
-                {recommendations.map((rec) => (
-                  <InterventionCard key={rec.title} {...rec} />
-                ))}
-              </div>
-            </div>
-            <ChatInterface />
-          </div>
-        </TabsContent>
-        <TabsContent value="analytics" className="space-y-4">
-          <div className="grid gap-4">
-            <Card className="p-6">
-              <h3 className="text-lg font-medium mb-4">Detailed Analytics</h3>
-              <p className="text-muted-foreground">Coming Soon</p>
-            </Card>
-          </div>
-        </TabsContent>
-        <TabsContent value="reports" className="space-y-4">
-          <div className="grid gap-4">
-            <Card className="p-6">
-              <h3 className="text-lg font-medium mb-4">Generated Reports</h3>
-              <p className="text-muted-foreground">Coming Soon</p>
-            </Card>
-          </div>
-        </TabsContent>
-        <TabsContent value="notifications" className="space-y-4">
-          <div className="grid gap-4">
-            <Card className="p-6">
-              <h3 className="text-lg font-medium mb-4">System Notifications</h3>
-              <p className="text-muted-foreground">Coming Soon</p>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+    );
+  }
+
+  // Construct URL params for the filters
+  const filterParams = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) filterParams.append(key, value);
+  });
+  const filterString = filterParams.toString();
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      <EquityFilters onFilterChange={handleFilterChange} />
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatsCard
+          title="Total Patients"
+          value={stats.totalPatients.current}
+          change={stats.totalPatients.change}
+          description="Total number of unique patients in the system"
+          rawData={stats.totalPatients.rawData}
+        />
+        <StatsCard
+          title="Active Cases"
+          value={stats.activeCases.current}
+          change={stats.activeCases.change}
+          description="Number of patients currently under active care"
+          rawData={stats.activeCases.rawData}
+        />
+        <StatsCard
+          title="Readmission Rate"
+          value={stats.readmissionRate.current}
+          unit="%"
+          change={stats.readmissionRate.change}
+          description="Percentage of patients readmitted within 30 days"
+          rawData={stats.readmissionRate.rawData}
+        />
+        <StatsCard
+          title="Patient Satisfaction"
+          value={stats.patientSatisfaction.current}
+          unit="%"
+          change={stats.patientSatisfaction.change}
+          description="Average patient satisfaction score"
+          rawData={stats.patientSatisfaction.rawData}
+        />
+      </div>
+
+      <div className="p-6 bg-card rounded-lg border">
+        <h3 className="text-lg font-medium mb-4">Population Health Trends</h3>
+        <HealthTrendsChart key={filterString} filters={filters} />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="p-6 bg-card rounded-lg border">
+          <h3 className="text-lg font-medium mb-4">Demographic Distribution</h3>
+          <DemographicDistribution key={filterString} dimension="race" filters={filters} />
+        </div>
+        <div className="p-6 bg-card rounded-lg border">
+          <h3 className="text-lg font-medium mb-4">Condition Distribution</h3>
+          <ConditionDistribution key={filterString} filters={filters} />
+        </div>
+      </div>
     </div>
   );
 } 

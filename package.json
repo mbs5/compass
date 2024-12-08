@@ -2,6 +2,7 @@
   "name": "lokahi-compass",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,6 +12,8 @@
   "dependencies": {
     "@langchain/core": "^0.3.22",
     "@langchain/openai": "^0.3.14",
+    "@nivo/core": "^0.88.0",
+    "@nivo/pie": "^0.88.0",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
@@ -20,19 +23,26 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.2",
+    "apexcharts": "^4.1.0",
+    "better-sqlite3": "^11.7.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "csv-parse": "^5.6.0",
     "langchain": "^0.3.6",
     "lucide-react": "^0.468.0",
     "next": "^14.0.4",
     "next-themes": "^0.4.4",
     "openai": "^4.76.0",
     "react": "^18.2.0",
+    "react-apexcharts": "^1.7.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.14.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^20",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^19",
@@ -40,6 +50,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

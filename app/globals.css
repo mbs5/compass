@@ -3,6 +3,38 @@
 @tailwind utilities;
 
 @layer base {
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  dialog[open] {
+    animation: dialog-show 0.3s ease normal;
+  }
+  
+  dialog[open]::backdrop {
+    animation: dialog-backdrop-show 0.3s ease normal;
+  }
+  
+  @keyframes dialog-show {
+    from {
+      opacity: 0;
+      transform: translateY(-10%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0%);
+    }
+  }
+  
+  @keyframes dialog-backdrop-show {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
