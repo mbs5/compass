@@ -3,6 +3,26 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HealthTrendsChart } from "@/app/components/charts/health-trends-chart";
+import { InterventionCard } from "@/app/components/recommendations/intervention-card";
+import { EquityFilters } from "@/app/components/filters/equity-filters";
+import { ChatInterface } from "@/app/components/ai/chat-interface";
+
+const recommendations = [
+  {
+    title: "Telehealth Diabetes Management Program",
+    description: "Implement remote monitoring and virtual consultations for high-risk diabetes patients to reduce complications and ED visits.",
+    roi: "3.2x",
+    impact: "High",
+    timeframe: "6mo",
+  },
+  {
+    title: "Community Health Worker Program",
+    description: "Deploy trained community health workers in underserved areas to improve preventive care and cultural competency.",
+    roi: "2.5x",
+    impact: "High",
+    timeframe: "12mo",
+  },
+];
 
 export default function DashboardPage() {
   return (
@@ -18,6 +38,7 @@ export default function DashboardPage() {
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
+          <EquityFilters />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="p-6">
               <h3 className="text-sm font-medium">Total Patients</h3>
@@ -53,6 +74,17 @@ export default function DashboardPage() {
                 Map Component Coming Soon
               </div>
             </Card>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Recommended Interventions</h3>
+              <div className="space-y-4">
+                {recommendations.map((rec) => (
+                  <InterventionCard key={rec.title} {...rec} />
+                ))}
+              </div>
+            </div>
+            <ChatInterface />
           </div>
         </TabsContent>
         <TabsContent value="analytics" className="space-y-4">
