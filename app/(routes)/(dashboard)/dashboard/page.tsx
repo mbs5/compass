@@ -84,55 +84,61 @@ export default function DashboardPage() {
   const filterString = filterParams.toString();
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="flex-1 space-y-4 p-8 pt-6">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+      </div>
       <EquityFilters onFilterChange={handleFilterChange} />
-      
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Patients"
-          value={stats.totalPatients.current}
-          change={stats.totalPatients.change}
+          value={stats?.totalPatients.current || 0}
+          change={stats?.totalPatients.change || { value: 0, period: "24h", trend: "up" }}
           description="Total number of unique patients in the system"
-          rawData={stats.totalPatients.rawData}
+          rawData={stats?.totalPatients.rawData}
         />
         <StatsCard
           title="Active Cases"
-          value={stats.activeCases.current}
-          change={stats.activeCases.change}
+          value={stats?.activeCases.current || 0}
+          change={stats?.activeCases.change || { value: 0, period: "24h", trend: "up" }}
           description="Number of patients currently under active care"
-          rawData={stats.activeCases.rawData}
+          rawData={stats?.activeCases.rawData}
         />
         <StatsCard
           title="Readmission Rate"
-          value={stats.readmissionRate.current}
+          value={stats?.readmissionRate.current || 0}
           unit="%"
-          change={stats.readmissionRate.change}
+          change={stats?.readmissionRate.change || { value: 0, period: "24h", trend: "down" }}
           description="Percentage of patients readmitted within 30 days"
-          rawData={stats.readmissionRate.rawData}
+          rawData={stats?.readmissionRate.rawData}
         />
         <StatsCard
           title="Patient Satisfaction"
-          value={stats.patientSatisfaction.current}
+          value={stats?.patientSatisfaction.current || 0}
           unit="%"
-          change={stats.patientSatisfaction.change}
+          change={stats?.patientSatisfaction.change || { value: 0, period: "24h", trend: "up" }}
           description="Average patient satisfaction score"
-          rawData={stats.patientSatisfaction.rawData}
+          rawData={stats?.patientSatisfaction.rawData}
         />
       </div>
-
-      <div className="p-6 bg-card rounded-lg border">
-        <h3 className="text-lg font-medium mb-4">Population Health Trends</h3>
-        <HealthTrendsChart key={filterString} filters={filters} />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4">
         <div className="p-6 bg-card rounded-lg border">
-          <h3 className="text-lg font-medium mb-4">Demographic Distribution</h3>
-          <DemographicDistribution key={filterString} dimension="race" filters={filters} />
+          <h3 className="text-lg font-medium mb-4">Population Health Trends</h3>
+          <div className="h-[400px]">
+            <HealthTrendsChart key={filterString} filters={filters} />
+          </div>
         </div>
         <div className="p-6 bg-card rounded-lg border">
           <h3 className="text-lg font-medium mb-4">Condition Distribution</h3>
-          <ConditionDistribution key={filterString} filters={filters} />
+          <div className="h-[500px]">
+            <ConditionDistribution key={filterString} filters={filters} />
+          </div>
+        </div>
+        <div className="p-6 bg-card rounded-lg border">
+          <h3 className="text-lg font-medium mb-4">Demographic Distribution</h3>
+          <div className="h-[500px]">
+            <DemographicDistribution key={filterString} dimension="race" filters={filters} />
+          </div>
         </div>
       </div>
     </div>
