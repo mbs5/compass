@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { openai } from "@/app/lib/openai";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 const SYSTEM_PROMPT = `You are a healthcare analytics assistant for Lōkahi Health Compass. 
 Your role is to help users understand health trends, suggest interventions, and provide insights about health equity in Hawaii.
@@ -14,13 +13,17 @@ export async function POST(req: Request) {
   try {
     const { message } = await req.json();
 
-    const response = await openai.invoke([
-      new SystemMessage(SYSTEM_PROMPT),
-      new HumanMessage(message),
-    ]);
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: message }
+      ],
+      temperature: 0.7,
+    });
 
     return NextResponse.json({
-      content: response.content,
+      content: completion.choices[0].message.content,
     });
   } catch (error) {
     console.error("Chat API Error:", error);

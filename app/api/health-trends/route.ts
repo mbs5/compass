@@ -11,6 +11,20 @@ const conditionCategories = {
   "Other": []  // Catch-all for uncategorized conditions
 };
 
+// Define reverse mappings for race and ethnicity
+const REVERSE_RACE_LABELS: { [key: string]: string } = {
+  "Asian": "1",
+  "Black": "2",
+  "Hispanic": "3",
+  "White": "4"
+};
+
+const REVERSE_ETHNICITY_LABELS: { [key: string]: string } = {
+  "Hispanic": "1",
+  "Non-Hispanic": "2",
+  "Unknown": "3"
+};
+
 function categorizeCondition(condition: string): string {
   const upperCondition = condition.toUpperCase();
   for (const [category, keywords] of Object.entries(conditionCategories)) {
@@ -25,9 +39,17 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const gender = searchParams.get("gender");
-    const race = searchParams.get("race");
-    const ethnicity = searchParams.get("ethnicity");
+    let race = searchParams.get("race");
+    let ethnicity = searchParams.get("ethnicity");
     const state = searchParams.get("state");
+
+    // Convert labels back to database values
+    if (race) {
+      race = REVERSE_RACE_LABELS[race] || race;
+    }
+    if (ethnicity) {
+      ethnicity = REVERSE_ETHNICITY_LABELS[ethnicity] || ethnicity;
+    }
 
     // First check if table exists
     const tableExists = db.prepare(`

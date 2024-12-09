@@ -1,20 +1,33 @@
 import { NextResponse } from "next/server";
 const db = require("@/app/lib/db");
 
-// Define mappings for race and ethnicity codes
+// Define interfaces for database records
+interface DemographicRecord {
+  race?: string;
+  ethnicity?: string;
+  gender?: string;
+  state?: string;
+  condition?: string;
+  count: number;
+}
+
+interface ResultRecord {
+  MEM_RACE?: string;
+  MEM_ETHNICITY?: string;
+  member_count: number;
+}
+
+// Define mappings for race and ethnicity codes based on actual database values
 const RACE_LABELS: { [key: string]: string } = {
-  "1": "White",
-  "2": "Black or African American",
-  "3": "Asian",
-  "4": "American Indian or Alaska Native",
-  "5": "Native Hawaiian or Other Pacific Islander",
-  "6": "Some Other Race",
-  "7": "Two or More Races"
+  "1": "Asian",
+  "2": "Black",
+  "3": "Hispanic",
+  "4": "White"
 };
 
 const ETHNICITY_LABELS: { [key: string]: string } = {
-  "1": "Hispanic or Latino",
-  "2": "Not Hispanic or Latino",
+  "1": "Hispanic",
+  "2": "Non-Hispanic",
   "3": "Unknown"
 };
 
@@ -40,10 +53,10 @@ export async function GET(request: Request) {
       gender: db.prepare('SELECT DISTINCT gender FROM demographic_summary').all(),
       race: db.prepare('SELECT DISTINCT race FROM demographic_summary')
         .all()
-        .map(r => ({ race: RACE_LABELS[r.race] || r.race })),
+        .map((r: DemographicRecord) => ({ race: RACE_LABELS[r.race || ""] || r.race })),
       ethnicity: db.prepare('SELECT DISTINCT ethnicity FROM demographic_summary')
         .all()
-        .map(e => ({ ethnicity: ETHNICITY_LABELS[e.ethnicity] || e.ethnicity })),
+        .map((e: DemographicRecord) => ({ ethnicity: ETHNICITY_LABELS[e.ethnicity || ""] || e.ethnicity })),
       state: db.prepare('SELECT DISTINCT state FROM demographic_summary').all(),
       condition: db.prepare('SELECT DISTINCT condition FROM demographic_summary').all()
     };
@@ -71,12 +84,12 @@ export async function GET(request: Request) {
 
       // Apply labels for race and ethnicity
       if (dimension === 'race') {
-        results.forEach(r => {
-          r.MEM_RACE = RACE_LABELS[r.MEM_RACE] || r.MEM_RACE;
+        results.forEach((r: ResultRecord) => {
+          r.MEM_RACE = RACE_LABELS[r.MEM_RACE || ""] || r.MEM_RACE;
         });
       } else if (dimension === 'ethnicity') {
-        results.forEach(e => {
-          e.MEM_ETHNICITY = ETHNICITY_LABELS[e.MEM_ETHNICITY] || e.MEM_ETHNICITY;
+        results.forEach((e: ResultRecord) => {
+          e.MEM_ETHNICITY = ETHNICITY_LABELS[e.MEM_ETHNICITY || ""] || e.MEM_ETHNICITY;
         });
       }
 
